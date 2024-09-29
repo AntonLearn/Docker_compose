@@ -1,0 +1,6 @@
+Dockerfile
+requests.http
+static/
+*/migrations/
+.env
+env/

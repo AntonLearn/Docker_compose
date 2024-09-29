@@ -1,0 +1,9 @@
+.git/
+smart_home/.env
+smart_home/env/
+smart_home/static/
+smart_home/.idea/
+smart_home/smart_home/__pycache__/
+smart_home/measurement/__pycache__/
+smart_home/measurement/migrations/
+smart_home/db.sqlite3

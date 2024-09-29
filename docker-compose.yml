@@ -1,0 +1,56 @@
+version: "3.9"
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
+    name: backend
+
+services:
+  web:
+    build: ./smart_home
+    ports:
+      - 8000:8000
+    container_name: web
+    restart: always
+    env_file:
+      - ./.env
+    volumes:
+      - ./smart_home/:/smart_home
+      - ./smart_home/static:/smart_home/static
+    depends_on:
+      - postgres
+    command: sh -c "python manage.py makemigrations measurement &&
+                    python manage.py migrate &&
+                    python manage.py createcachetable &&
+                    python manage.py collectstatic --no-input &&
+                    gunicorn smart_home.wsgi:application --bind 0.0.0.0:8000"
+    networks:
+      - backend
+    hostname: web
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: always
+    env_file:
+      - ./.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    hostname: postgres
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - 8080:80
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./smart_home/static:/smart_home/static
+      - ./nginx/:/etc/nginx/conf.d:ro
+    depends_on:
+      - web
+    networks:
+      - backend
+    hostname: nginx

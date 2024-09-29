@@ -1,0 +1,12 @@
+FROM python:3.12-alpine 
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+RUN apk update  && apk add libpq
+RUN apk add --virtual .build-deps gcc python3-dev musl-dev postgresql-dev
+RUN pip install --upgrade pip
+COPY requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+WORKDIR /smart_home
+RUN apk del .build-deps
+COPY . .
+RUN chmod -R 777 ./
